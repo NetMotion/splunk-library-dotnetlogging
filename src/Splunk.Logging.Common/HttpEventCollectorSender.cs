@@ -148,7 +148,8 @@ namespace Splunk.Logging
             SendMode sendMode,
             int batchInterval, int batchSizeBytes, int batchSizeCount,
             HttpEventCollectorMiddleware middleware,
-            HttpEventCollectorFormatter formatter = null)
+            HttpEventCollectorFormatter formatter = null,
+            WebRequestHandler handler = null)
         {
             this.serializer = new JsonSerializer();
             serializer.NullValueHandling = NullValueHandling.Ignore;
@@ -189,7 +190,15 @@ namespace Splunk.Logging
             }
 
             // setup HTTP client
-            httpClient = new HttpClient();
+            if (handler != null)
+            {
+                httpClient = new HttpClient(handler);
+            }
+            else
+            {
+                httpClient = new HttpClient();
+            }
+            
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue(AuthorizationHeaderScheme, token);
         }
